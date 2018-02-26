@@ -1,0 +1,12 @@
+[package]
+name = "sfxr-web"
+version = "0.1.0"
+authors = ["Teemu Erkkola <teemu.erkkola@iki.fi>"]
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+sfxr = { git = "https://github.com/bzar/sfxr-rs.git" }
+hound = "3.3.1"
