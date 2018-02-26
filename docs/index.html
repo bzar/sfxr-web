@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+<style>
+  input, label {
+    display: block;
+  }
+  form {
+    display: flex;
+    flex-flow: row wrap;
+  }
+  fieldset {
+    flex: 1 1 auto;
+  }
+  #play {
+    flex: 1 0 auto;
+  }
+
+</style>
+</head>
+<body>
+<form>
+  <fieldset>
+    <label for="wave_type">Wave type</label>
+    <select name="wave_type" id="wave_type">
+      <option value="0">Square</option>
+      <option value="1">Sine</option>
+      <option value="2">Triangle</option>
+      <option value="3">Noise</option>
+    </select>
+
+    <label for="base_freq">Base frequency</label>
+    <input name="base_freq" id="base_freq" type="range" min="0.01" max="1.0" step="0.01">
+    <label for="freq_limit">Frequency limit</label>
+    <input name="freq_limit" id="freq_limit" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="freq_ramp">Frequency ramp</label>
+    <input name="freq_ramp" id="freq_ramp" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="freq_dramp">Frequency ramp acceleration</label>
+    <input name="freq_dramp" id="freq_dramp" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="duty">Square duty</label>
+    <input name="duty" id="duty" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="duty_ramp">Square duty ramp</label>
+    <input name="duty_ramp" id="duty_ramp" type="range" min="0.00" max="1.0" step="0.01">
+  </fieldset>
+
+  <fieldset>
+    <label for="vib_strength">Vibrato strength</label>
+    <input name="vib_strength" id="vib_strength" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="vib_speed">Vibrato speed</label>
+    <input name="vib_speed" id="vib_speed" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="vib_delay">Vibrato delay</label>
+    <input name="vib_delay" id="vib_delay" type="range" min="0.00" max="1.0" step="0.01">
+  </fieldset>
+
+  <fieldset>
+    <label for="env_attack">Attack duration</label>
+    <input name="env_attack" id="env_attack" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="env_sustain">Sustain duration</label>
+    <input name="env_sustain" id="env_sustain" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="env_decay">Decay duration</label>
+    <input name="env_decay" id="env_decay" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="env_punch">Punch</label>
+    <input name="env_punch" id="env_punch" type="range" min="0.00" max="1.0" step="0.01">
+  </fieldset>
+
+  <fieldset>
+    <label for="lpf_resonance">LPF resonance</label>
+    <input name="lpf_resonance" id="lpf_resonance" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="lpf_freq">LPF frequency</label>
+    <input name="lpf_freq" id="lpf_freq" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="lpf_ramp">LPF ramp</label>
+    <input name="lpf_ramp" id="lpf_ramp" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="hpf_freq">HPF frequency</label>
+    <input name="hpf_freq" id="hpf_freq" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="hpf_ramp">HPF ramp</label>
+    <input name="hpf_ramp" id="hpf_ramp" type="range" min="0.00" max="1.0" step="0.01">
+  </fieldset>
+
+  <fieldset>
+    <label for="pha_offset">Phaser offset</label>
+    <input name="pha_offset" id="pha_offset" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="pha_ramp">Phaser ramp</label>
+    <input name="pha_ramp" id="pha_ramp" type="range" min="0.00" max="1.0" step="0.01">
+  </fieldset>
+
+  <fieldset>
+    <label for="repeat_speed">Repeat speed</label>
+    <input name="repeat_speed" id="repeat_speed" type="range" min="0.00" max="1.0" step="0.01">
+  </fieldset>
+
+  <fieldset>
+    <label for="arp_speed">Arpeggio speed</label>
+    <input name="arp_speed" id="arp_speed" type="range" min="0.00" max="1.0" step="0.01">
+    <label for="arp_mod">Arpeggio strength</label>
+    <input name="arp_mod" id="arp_mod" type="range" min="0.00" max="1.0" step="0.01">
+  </fieldset>
+
+  <input id="play" type="button" value="Play">
+</form>
+  
+<a href="#" id="download">Download WAV file</a>
+<script>
+  function main(sfxr) {
+
+    let sample_fields = [
+      "wave_type", "base_freq", "freq_limit", "freq_ramp", "freq_dramp",
+      "duty", "duty_ramp", "vib_strength", "vib_speed", "vib_delay",
+      "env_attack", "env_sustain", "env_decay", "env_punch",
+      "lpf_resonance", "lpf_freq", "lpf_ramp", "hpf_freq", "hpf_ramp",
+      "pha_offset", "pha_ramp", "repeat_speed", "arp_speed", "arp_mod"
+    ];
+
+    sample_fields.forEach((field) => {
+      const el = document.getElementById(field);
+      el.value = sfxr.getValue(field);
+      el.addEventListener("change", (e) => {
+        const value = parseFloat(el.value);
+        sfxr.setValue(field, value);
+      });
+    });
+    document.getElementById("play").addEventListener("click", () => sfxr.play());
+    document.getElementById("download").addEventListener("click", (e) => {
+      let blob = sfxr.saveWav();
+      e.target.href = window.URL.createObjectURL(blob);
+      e.target.target = '_blank';
+      e.target.download = 'sample.wav';
+    });
+  }
+
+const sin = Math.sin;
+const sinf = Math.sin;
+const pow = Math.pow
+let env = {sin, sinf, pow};
+fetchAndInstantiate('sfxr_web.min.wasm', {env}).then(function(instance) {
+  instance.exports.init();
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const audioBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate*2.0, audioCtx.sampleRate);
+
+  let sfxr = {
+    play: () => {
+      instance.exports.render();
+      const bufferPtr = instance.exports.buffer_ptr();
+      const bufferLen = instance.exports.buffer_len();
+      audioBuffer.copyToChannel(new Float32Array(instance.exports.memory.buffer, bufferPtr, bufferLen), 0);
+      const source = audioCtx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioCtx.destination);
+      source.start();
+    },
+    getValue: (name) => {
+      return instance.exports[name]();
+    },
+    setValue: (name, value) => {
+      instance.exports["set_" + name](value);
+    },
+    saveWav: () => {
+      instance.exports.render_wav();
+      const bufferPtr = instance.exports.wav_buffer_ptr();
+      const bufferLen = instance.exports.wav_buffer_len();
+      const buffer = new Uint8Array(instance.exports.memory.buffer, bufferPtr, bufferLen);
+      return new Blob([buffer], {type: 'audio/wav'});
+    }
+  }
+
+  main(sfxr);
+});
+
+function fetchAndInstantiate(url, importObject) {
+  return fetch(url).then(response =>
+    response.arrayBuffer()
+  ).then(bytes =>
+    WebAssembly.instantiate(bytes, importObject)
+  ).then(results =>
+    results.instance
+  );
+}
+</script>
+</body>
+</html>
