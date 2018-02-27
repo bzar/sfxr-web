@@ -1,14 +1,18 @@
 extern crate sfxr;
 extern crate hound;
+extern crate prng;
+extern crate rng_trait;
 
 use sfxr::{Sample, Generator, WaveType};
+use rng_trait::Rng;
 
 const BUFFER_SIZE: usize = 44_100;
 
 struct State {
     generator: Generator,
     buffer: [f32; BUFFER_SIZE],
-    wav_buffer: Vec<u8>
+    wav_buffer: Vec<u8>,
+    rng: prng::Prng
 }
 
 static mut STATE: Option<State> = None;
@@ -20,8 +24,8 @@ pub fn init() {
         STATE = Some(State {
             generator,
             buffer: [0.0; BUFFER_SIZE],
-            wav_buffer: Vec::new()
-
+            wav_buffer: Vec::new(),
+            rng: prng::Prng::new()
         });
     }
 }
@@ -81,37 +85,37 @@ pub fn wav_buffer_len() -> usize {
 #[no_mangle]
 pub fn generate_pickup() {
     let state = unsafe { STATE.as_mut().unwrap() };
-    state.generator = Generator::new(Sample::pickup());
+    state.generator = Generator::new(Sample::pickup(Some(state.rng.next())));
 }
 #[no_mangle]
 pub fn generate_laser() {
     let state = unsafe { STATE.as_mut().unwrap() };
-    state.generator = Generator::new(Sample::laser());
+    state.generator = Generator::new(Sample::laser(Some(state.rng.next())));
 }
 #[no_mangle]
 pub fn generate_jump() {
     let state = unsafe { STATE.as_mut().unwrap() };
-    state.generator = Generator::new(Sample::jump());
+    state.generator = Generator::new(Sample::jump(Some(state.rng.next())));
 }
 #[no_mangle]
 pub fn generate_explosion() {
     let state = unsafe { STATE.as_mut().unwrap() };
-    state.generator = Generator::new(Sample::explosion());
+    state.generator = Generator::new(Sample::explosion(Some(state.rng.next())));
 }
 #[no_mangle]
 pub fn generate_powerup() {
     let state = unsafe { STATE.as_mut().unwrap() };
-    state.generator = Generator::new(Sample::powerup());
+    state.generator = Generator::new(Sample::powerup(Some(state.rng.next())));
 }
 #[no_mangle]
 pub fn generate_hit() {
     let state = unsafe { STATE.as_mut().unwrap() };
-    state.generator = Generator::new(Sample::hit());
+    state.generator = Generator::new(Sample::hit(Some(state.rng.next())));
 }
 #[no_mangle]
 pub fn generate_blip() {
     let state = unsafe { STATE.as_mut().unwrap() };
-    state.generator = Generator::new(Sample::blip());
+    state.generator = Generator::new(Sample::blip(Some(state.rng.next())));
 }
 
 #[no_mangle]

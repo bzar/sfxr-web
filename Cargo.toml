@@ -10,3 +10,5 @@ crate-type = ["cdylib"]
 [dependencies]
 sfxr = { git = "https://github.com/bzar/sfxr-rs.git" }
 hound = "3.3.1"
+rng_trait = "0.1"
+prng = "0.1.1"
