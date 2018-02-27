@@ -23,6 +23,15 @@
 <body>
 <form>
   <fieldset>
+    <input type="button" id="pickup" value="Pickup">
+    <input type="button" id="laser" value="Laser">
+    <input type="button" id="jump" value="Jump">
+    <input type="button" id="explosion" value="Explosion">
+    <input type="button" id="powerup" value="Powerup">
+    <input type="button" id="hit" value="Hit">
+    <input type="button" id="blip" value="Blip">
+  </fieldset>
+  <fieldset>
     <label for="wave_type">Wave type</label>
     <select name="wave_type" id="wave_type">
       <option value="0">Square</option>
@@ -38,7 +47,7 @@
     <label for="freq_ramp">Frequency ramp</label>
     <input name="freq_ramp" id="freq_ramp" type="range" min="-0.30" max="0.3" step="0.01">
     <label for="freq_dramp">Frequency ramp acceleration</label>
-    <input name="freq_dramp" id="freq_dramp" type="range" min="0.00" max="1.0" step="0.01">
+    <input name="freq_dramp" id="freq_dramp" type="range" min="-1.0" max="1.0" step="0.01">
     <label for="duty">Square duty</label>
     <input name="duty" id="duty" type="range" min="0.00" max="1.0" step="0.01">
     <label for="duty_ramp">Square duty ramp</label>
@@ -102,32 +111,47 @@
   
 <a href="#" id="download">Download WAV file</a>
 <script>
-  function main(sfxr) {
-
-    let sample_fields = [
-      "wave_type", "base_freq", "freq_limit", "freq_ramp", "freq_dramp",
-      "duty", "duty_ramp", "vib_strength", "vib_speed", "vib_delay",
-      "env_attack", "env_sustain", "env_decay", "env_punch",
-      "lpf_resonance", "lpf_freq", "lpf_ramp", "hpf_freq", "hpf_ramp",
-      "pha_offset", "pha_ramp", "repeat_speed", "arp_speed", "arp_mod"
-    ];
-
-    sample_fields.forEach((field) => {
-      const el = document.getElementById(field);
-      el.value = sfxr.getValue(field);
-      el.addEventListener("change", (e) => {
-        const value = parseFloat(el.value);
-        sfxr.setValue(field, value);
-      });
+const templates = ["pickup", "laser", "jump", "explosion", "powerup", "hit", "blip"];
+const sampleFields = [
+  "wave_type", "base_freq", "freq_limit", "freq_ramp", "freq_dramp",
+  "duty", "duty_ramp", "vib_strength", "vib_speed", "vib_delay",
+  "env_attack", "env_sustain", "env_decay", "env_punch",
+  "lpf_resonance", "lpf_freq", "lpf_ramp", "hpf_freq", "hpf_ramp",
+  "pha_offset", "pha_ramp", "repeat_speed", "arp_speed", "arp_mod"
+];
+function loadValues(sfxr) {
+  sampleFields.forEach((field) => {
+    const el = document.getElementById(field);
+    el.value = sfxr.getValue(field);
+  });
+}
+function main(sfxr) {
+  templates.forEach((name) => {
+    const el = document.getElementById(name);
+    el.addEventListener("click", (e) => {
+      sfxr.loadTemplate(name);
+      loadValues(sfxr);
+      sfxr.play();
     });
-    document.getElementById("play").addEventListener("click", () => sfxr.play());
-    document.getElementById("download").addEventListener("click", (e) => {
-      let blob = sfxr.saveWav();
-      e.target.href = window.URL.createObjectURL(blob);
-      e.target.target = '_blank';
-      e.target.download = 'sample.wav';
+  });
+
+  loadValues(sfxr);
+
+  sampleFields.forEach((field) => {
+    const el = document.getElementById(field);
+    el.addEventListener("change", (e) => {
+      const value = parseFloat(el.value);
+      sfxr.setValue(field, value);
     });
-  }
+  });
+  document.getElementById("play").addEventListener("click", () => sfxr.play());
+  document.getElementById("download").addEventListener("click", (e) => {
+    let blob = sfxr.saveWav();
+    e.target.href = window.URL.createObjectURL(blob);
+    e.target.target = '_blank';
+    e.target.download = 'sample.wav';
+  });
+}
 
 const sin = Math.sin;
 const sinf = Math.sin;
@@ -154,6 +178,9 @@ fetchAndInstantiate('sfxr_web.min.wasm', {env}).then(function(instance) {
     },
     setValue: (name, value) => {
       instance.exports["set_" + name](value);
+    },
+    loadTemplate: (name) => {
+      instance.exports["generate_" + name]();
     },
     saveWav: () => {
       instance.exports.render_wav();

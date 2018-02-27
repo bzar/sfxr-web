@@ -28,37 +28,28 @@ pub fn init() {
 
 #[no_mangle]
 pub fn render() {
-    unsafe {
-        let state = STATE.as_mut().unwrap();
-        state.generator.reset();
-        state.generator.generate(&mut state.buffer);
-        state.generator.reset();
-    }
+    let state = unsafe { STATE.as_mut().unwrap() };
+    state.generator.reset();
+    state.generator.generate(&mut state.buffer);
 }
 
 #[no_mangle]
 pub fn buffer_ptr() -> *const f32 {
-    unsafe {
-        let state = STATE.as_ref().unwrap();
-        state.buffer.as_ptr()
-    }
+    let state = unsafe { STATE.as_ref().unwrap() };
+    state.buffer.as_ptr()
 }
 
 #[no_mangle]
 pub fn buffer_len() -> usize {
-    unsafe {
-        let state = STATE.as_ref().unwrap();
-        state.buffer.len()
-    }
+    let state = unsafe { STATE.as_ref().unwrap() };
+    state.buffer.len()
 }
 
 #[no_mangle]
 pub fn render_wav() {
     use hound;
     use std::io::Cursor;
-    let state = unsafe {
-        STATE.as_mut().unwrap()
-    };
+    let state = unsafe { STATE.as_mut().unwrap() };
 
     let spec = hound::WavSpec {
         channels: 1,
@@ -67,8 +58,8 @@ pub fn render_wav() {
         sample_format: hound::SampleFormat::Float,
     };
 
-    state.generator.generate(&mut state.buffer);
     state.generator.reset();
+    state.generator.generate(&mut state.buffer);
     state.wav_buffer.clear();
     let writer = Cursor::new(&mut state.wav_buffer);
     let mut wav_writer = hound::WavWriter::new(writer, spec).unwrap();
@@ -77,52 +68,77 @@ pub fn render_wav() {
 
 #[no_mangle]
 pub fn wav_buffer_ptr() -> *const u8 {
-    unsafe {
-        let state = STATE.as_ref().unwrap();
-        state.wav_buffer.as_ptr()
-    }
+    let state = unsafe { STATE.as_ref().unwrap() };
+    state.wav_buffer.as_ptr()
 }
 
 #[no_mangle]
 pub fn wav_buffer_len() -> usize {
-    unsafe {
-        let state = STATE.as_ref().unwrap();
-        state.wav_buffer.len()
-    }
+    let state = unsafe { STATE.as_ref().unwrap() };
+    state.wav_buffer.len()
+}
+
+#[no_mangle]
+pub fn generate_pickup() {
+    let state = unsafe { STATE.as_mut().unwrap() };
+    state.generator = Generator::new(Sample::pickup());
+}
+#[no_mangle]
+pub fn generate_laser() {
+    let state = unsafe { STATE.as_mut().unwrap() };
+    state.generator = Generator::new(Sample::laser());
+}
+#[no_mangle]
+pub fn generate_jump() {
+    let state = unsafe { STATE.as_mut().unwrap() };
+    state.generator = Generator::new(Sample::jump());
+}
+#[no_mangle]
+pub fn generate_explosion() {
+    let state = unsafe { STATE.as_mut().unwrap() };
+    state.generator = Generator::new(Sample::explosion());
+}
+#[no_mangle]
+pub fn generate_powerup() {
+    let state = unsafe { STATE.as_mut().unwrap() };
+    state.generator = Generator::new(Sample::powerup());
+}
+#[no_mangle]
+pub fn generate_hit() {
+    let state = unsafe { STATE.as_mut().unwrap() };
+    state.generator = Generator::new(Sample::hit());
+}
+#[no_mangle]
+pub fn generate_blip() {
+    let state = unsafe { STATE.as_mut().unwrap() };
+    state.generator = Generator::new(Sample::blip());
 }
 
 #[no_mangle]
 pub fn wave_type() -> usize {
-    unsafe {
-        let state = STATE.as_ref().unwrap();
-        state.generator.sample.wave_type as usize
-    }
+    let state = unsafe { STATE.as_ref().unwrap() };
+    state.generator.sample.wave_type as usize
 }
+
 #[no_mangle]
 pub fn set_wave_type(value: usize) {
-    unsafe {
-        let state = STATE.as_mut().unwrap();
-        let wave_types = [WaveType::Square, WaveType::Sine, WaveType::Triangle, WaveType::Noise];
-        let value = wave_types[value];
-        state.generator.sample.wave_type = value;
-    }
+    let state = unsafe { STATE.as_mut().unwrap() };
+    let wave_types = [WaveType::Square, WaveType::Sine, WaveType::Triangle, WaveType::Noise];
+    let value = wave_types[value];
+    state.generator.sample.wave_type = value;
 }
 
 macro_rules! getter_setter {
     ($value_type:ty, $field:ident, $setter:ident) => {
         #[no_mangle]
         pub fn $field() -> $value_type {
-            unsafe {
-                let state = STATE.as_ref().unwrap();
-                state.generator.sample.$field
-            }
+            let state = unsafe { STATE.as_ref().unwrap() };
+            state.generator.sample.$field
         }
         #[no_mangle]
         pub fn $setter(value: $value_type) {
-            unsafe {
-                let state = STATE.as_mut().unwrap();
-                state.generator.sample.$field = value;
-            }
+            let state = unsafe { STATE.as_mut().unwrap() };
+            state.generator.sample.$field = value;
         }
     };
 }
