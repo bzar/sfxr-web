@@ -157,7 +157,7 @@ const sin = Math.sin;
 const sinf = Math.sin;
 const pow = Math.pow
 let env = {sin, sinf, pow};
-fetchAndInstantiate('sfxr_web.min.wasm', {env}).then(function(instance) {
+fetchAndInstantiate('sfxr_web.wasm', {env}).then(function(instance) {
   instance.exports.init();
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   const audioBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate*2.0, audioCtx.sampleRate);
